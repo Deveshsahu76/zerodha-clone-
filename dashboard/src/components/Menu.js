@@ -1,17 +1,34 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState(0);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!token) {
+      window.location.href =
+        "https://zerodha-clone-frontend-7qlg.onrender.com/login";
+    }
+  }, [token]);
+
   const handleMenuClick = (index) => {
     setSelectedMenu(index);
   };
 
-  const handleProfileClick = (index) => {
+  const handleProfileClick = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    window.location.href =
+      "https://zerodha-clone-frontend-7qlg.onrender.com/";
   };
 
   const menuClass = "menu";
@@ -19,7 +36,12 @@ const Menu = () => {
 
   return (
     <div className="menu-container">
-      <img src="logo.png" style={{ width: "50px" }} />
+      <img
+        src="logo.png"
+        style={{ width: "50px" }}
+        alt="Logo"
+      />
+
       <div className="menus">
         <ul>
           <li>
@@ -33,6 +55,7 @@ const Menu = () => {
               </p>
             </Link>
           </li>
+
           <li>
             <Link
               style={{ textDecoration: "none" }}
@@ -44,6 +67,7 @@ const Menu = () => {
               </p>
             </Link>
           </li>
+
           <li>
             <Link
               style={{ textDecoration: "none" }}
@@ -55,6 +79,7 @@ const Menu = () => {
               </p>
             </Link>
           </li>
+
           <li>
             <Link
               style={{ textDecoration: "none" }}
@@ -66,10 +91,11 @@ const Menu = () => {
               </p>
             </Link>
           </li>
+
           <li>
             <Link
               style={{ textDecoration: "none" }}
-              to="funds"
+              to="/funds"
               onClick={() => handleMenuClick(4)}
             >
               <p className={selectedMenu === 4 ? activeMenuClass : menuClass}>
@@ -77,23 +103,49 @@ const Menu = () => {
               </p>
             </Link>
           </li>
+
           <li>
             <Link
               style={{ textDecoration: "none" }}
               to="/apps"
-              onClick={() => handleMenuClick(6)}
+              onClick={() => handleMenuClick(5)}
             >
-              <p className={selectedMenu === 6 ? activeMenuClass : menuClass}>
+              <p className={selectedMenu === 5 ? activeMenuClass : menuClass}>
                 Apps
               </p>
             </Link>
           </li>
         </ul>
+
         <hr />
+
         <div className="profile" onClick={handleProfileClick}>
-          <div className="avatar">ZU</div>
-          <p className="username">USERID</p>
+          <div className="avatar">
+            {user?.fullname
+              ? user.fullname.charAt(0).toUpperCase()
+              : "U"}
+          </div>
+
+          <p className="username">
+            {user?.fullname || "User"}
+          </p>
         </div>
+
+        {isProfileDropdownOpen && (
+          <div
+            style={{
+              marginTop: "10px",
+              textAlign: "center",
+            }}
+          >
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,6 +2,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function Navbar() {
+  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    window.location.href = "/";
+  };
+
   return (
     <nav
       className="navbar navbar-expand-lg border-bottom"
@@ -21,9 +31,6 @@ function Navbar() {
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -33,11 +40,6 @@ function Navbar() {
           id="navbarSupportedContent"
         >
           <ul className="navbar-nav ms-auto mb-lg-0">
-            <li className="nav-item">
-              <Link className="nav-link" to="/signup">
-                Signup
-              </Link>
-            </li>
 
             <li className="nav-item">
               <Link className="nav-link" to="/about">
@@ -62,6 +64,43 @@ function Navbar() {
                 Support
               </Link>
             </li>
+
+            {!token ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">
+                    Login
+                  </Link>
+                </li>
+
+                <li className="nav-item">
+                  <Link className="nav-link" to="/signup">
+                    Signup
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <span
+                    className="nav-link"
+                    style={{ fontWeight: "bold" }}
+                  >
+                    {user?.fullname}
+                  </span>
+                </li>
+
+                <li className="nav-item">
+                  <button
+                    className="btn btn-danger ms-2"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            )}
+
           </ul>
         </div>
       </div>

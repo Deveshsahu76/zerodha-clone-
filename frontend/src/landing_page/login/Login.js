@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-function Signup() {
+function Login() {
   const [user, setUser] = useState({
-    fullname: "",
     email: "",
     password: "",
   });
@@ -20,48 +19,36 @@ function Signup() {
 
     try {
       const res = await axios.post(
-        "https://zerodha-clone-backend-po9t.onrender.com/signup",
+        "https://zerodha-clone-backend-po9t.onrender.com/login",
         user
       );
 
-      alert(res.data.message);
+      // Save user data
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify(res.data.user)
+      );
 
-      // Login page par redirect
+      alert("Login Successful");
+
+      // Redirect to Dashboard
       window.location.href =
-        "https://zerodha-clone-frontend-7qlg.onrender.com/login";
+        "https://zerodha-clone-dashboard-dszd.onrender.com/";
+
     } catch (err) {
-      if (err.response?.status === 400) {
-        const goToLogin = window.confirm(
-          "User already exists.\n\nDo you want to Login?"
-        );
-
-        if (goToLogin) {
-          window.location.href =
-            "https://zerodha-clone-frontend-7qlg.onrender.com/login";
-        }
-
-        return;
-      }
-
-      alert(err.response?.data?.message || "Signup Failed");
+      alert(
+        err.response?.data?.message ||
+        "Login Failed"
+      );
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">Create your Account</h2>
+      <h2 className="mb-4">Login</h2>
 
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="fullname"
-          className="form-control mb-3"
-          placeholder="Full Name"
-          value={user.fullname}
-          onChange={handleChange}
-          required
-        />
-
         <input
           type="email"
           name="email"
@@ -83,19 +70,19 @@ function Signup() {
         />
 
         <button
-          className="btn btn-primary w-100"
           type="submit"
+          className="btn btn-primary w-100"
         >
-          Signup
+          Login
         </button>
 
         <div className="text-center mt-3">
-          Already have an account?{" "}
-          <a href="/login">Login</a>
+          Don't have an account?{" "}
+          <a href="/signup">Signup</a>
         </div>
       </form>
     </div>
   );
 }
 
-export default Signup;
+export default Login;
