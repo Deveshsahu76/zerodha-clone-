@@ -31,6 +31,9 @@ function Navbar() {
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -86,13 +89,13 @@ function Navbar() {
                     className="nav-link"
                     style={{ fontWeight: "bold" }}
                   >
-                    {user?.fullname}
+                    👋 {user?.fullname}
                   </span>
                 </li>
 
                 <li className="nav-item">
                   <button
-                    className="btn btn-danger ms-2"
+                    className="btn btn-outline-danger ms-2"
                     onClick={handleLogout}
                   >
                     Logout
@@ -100,7 +103,6 @@ function Navbar() {
                 </li>
               </>
             )}
-
           </ul>
         </div>
       </div>
