@@ -25,10 +25,7 @@ function Login() {
 
       // Save user data
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify(res.data.user)
-      );
+      localStorage.setItem("user",JSON.stringify(res.data.user));
 
       alert("Login Successful");
 
