@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { clearAuth, FRONTEND_URL, getStoredAuth } from "../utils/auth";
 
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState(0);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = localStorage.getItem("token");
+  const { user, token } = getStoredAuth();
 
   useEffect(() => {
     if (!token) {
-      window.location.href =
-        "https://zerodha-clone-frontend-7qlg.onrender.com/login";
+      window.location.href = `${FRONTEND_URL}/login`;
     }
   }, [token]);
 
@@ -20,15 +19,12 @@ const Menu = () => {
   };
 
   const handleProfileClick = () => {
-    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+    setIsProfileDropdownOpen((prev) => !prev);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    window.location.href =
-      "https://zerodha-clone-frontend-7qlg.onrender.com/";
+    clearAuth();
+    window.location.href = FRONTEND_URL;
   };
 
   const menuClass = "menu";

@@ -1,13 +1,8 @@
 import React from "react";
+import { getStoredAuth } from "../utils/auth";
 
 const Summary = () => {
-  let user = null;
-
-  try {
-    user = JSON.parse(localStorage.getItem("user"));
-  } catch (err) {
-    user = null;
-  }
+  const { user } = getStoredAuth();
 
   return (
     <>

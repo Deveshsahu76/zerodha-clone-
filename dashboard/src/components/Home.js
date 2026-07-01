@@ -2,19 +2,27 @@ import React, { useEffect, useState } from "react";
 
 import Dashboard from "./Dashboard";
 import TopBar from "./TopBar";
+import { FRONTEND_URL, getStoredAuth, verifySession } from "../utils/auth";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const bootstrapSession = async () => {
+      const { token } = getStoredAuth();
 
-    if (!token) {
-      window.location.href =
-        "https://zerodha-clone-frontend-7qlg.onrender.com/login";
-    } else {
+      if (!token) {
+        const session = await verifySession();
+        if (!session?.valid) {
+          window.location.href = `${FRONTEND_URL}/login`;
+          return;
+        }
+      }
+
       setLoading(false);
-    }
+    };
+
+    bootstrapSession();
   }, []);
 
   if (loading) {

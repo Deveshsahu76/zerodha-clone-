@@ -18,8 +18,64 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 const uri = process.env.MONGO_URL;
 
-app.use(cors());
+const allowedOrigins = [
+  "https://zerodha-clone-frontend-7qlg.onrender.com",
+  "https://zerodha-clone-dashboard-dszd.onrender.com",
+  "http://localhost:3000",
+  "http://localhost:3001",
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
+
+const getTokenFromRequest = (req) => {
+  const cookieHeader = req.headers.cookie || "";
+  const cookies = cookieHeader.split(";").reduce((acc, item) => {
+    const [key, value] = item.split("=");
+    if (key && value) {
+      acc[key.trim()] = decodeURIComponent(value.trim());
+    }
+    return acc;
+  }, {});
+
+  const cookieToken = cookies.token;
+  const authHeader = req.headers.authorization || "";
+  const headerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  return cookieToken || headerToken;
+};
+
+const isProduction = process.env.NODE_ENV === "production";
+
+const setAuthCookie = (res, token) => {
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    domain: isProduction ? ".onrender.com" : undefined,
+  });
+};
+
+const clearAuthCookie = (res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    domain: isProduction ? ".onrender.com" : undefined,
+  });
+};
 
 // ===================== Holdings =====================
 
@@ -90,7 +146,6 @@ app.post("/signup", async (req, res) => {
 
     await newUser.save();
 
-    // JWT Token Generate
     const token = jwt.sign(
       {
         userId: newUser._id,
@@ -101,6 +156,8 @@ app.post("/signup", async (req, res) => {
         expiresIn: "7d",
       }
     );
+
+    setAuthCookie(res, token);
 
     res.status(201).json({
       message: "Signup successful",
@@ -151,6 +208,8 @@ app.post("/login", async (req, res) => {
       }
     );
 
+    setAuthCookie(res, token);
+
     res.status(200).json({
       message: "Login successful",
       token,
@@ -167,28 +226,41 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/logout", (req, res) => {
+  clearAuthCookie(res);
+  res.status(200).json({ message: "Logout successful" });
+});
+
 // ===================== Verify Token =====================
 
-app.get("/verify", (req, res) => {
+app.get("/verify", async (req, res) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = getTokenFromRequest(req);
 
-    if (!authHeader) {
+    if (!token) {
       return res.status(401).json({
+        valid: false,
         message: "No Token",
       });
     }
 
-    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await UserModel.findById(decoded.userId).select("-password");
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET
-    );
+    if (!user) {
+      return res.status(401).json({
+        valid: false,
+        message: "Invalid Token",
+      });
+    }
 
     res.status(200).json({
       valid: true,
-      user: decoded,
+      user: {
+        id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+      },
     });
   } catch (err) {
     res.status(401).json({

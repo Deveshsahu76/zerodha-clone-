@@ -5,6 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #f8fafc;
+  color: #0f172a;
 }
 
 code {
@@ -12,26 +14,46 @@ code {
     monospace;
 }
 
-.nav-link{
-  margin-left: 40px;
+.nav-link {
+  margin-left: 24px;
+  color: #172033 !important;
+  font-weight: 500;
 }
 
-#supportHero{
-  background-color: rgb(56, 126, 209);
+.navbar-brand img {
+  max-width: 140px;
+}
+
+.card {
+  border-radius: 18px;
+}
+
+.btn-primary {
+  background: #387ed1;
+  border-color: #387ed1;
+}
+
+.btn-primary:hover {
+  background: #2962a3;
+  border-color: #2962a3;
+}
+
+#supportHero {
+  background: linear-gradient(135deg, #387ed1, #1d4ed8);
   color: white;
 }
 
-#supportHero a{
+#supportHero a {
   color: white;
 }
 
-#supportWrapper{
+#supportWrapper {
   display: flex;
   justify-content: space-between;
   margin: 0 150px;
 }
 
-#supportHero input{
+#supportHero input {
   padding: 20px 50px;
   width: 100%;
   font-size: 20px;

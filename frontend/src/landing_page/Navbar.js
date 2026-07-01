@@ -1,15 +1,14 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { clearAuth, getStoredAuth } from "../utils/auth";
 
 function Navbar() {
-  const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+  const { token, user } = getStoredAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    window.location.href = "/";
+    clearAuth();
+    navigate("/");
   };
 
   return (
