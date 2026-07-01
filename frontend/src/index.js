@@ -15,6 +15,7 @@ import SupportPage from "./landing_page/support/SupportPage";
 import Navbar from "./landing_page/Navbar";
 import Footer from "./landing_page/Footer";
 import NotFound from "./landing_page/NotFound";
+import ForgotPassword from "./landing_page/forgot_password/ForgotPassword";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -27,6 +28,7 @@ root.render(
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         <Route path="/about" element={<AboutPage />} />
         <Route path="/product" element={<ProductPage />} />

@@ -231,6 +231,55 @@ app.post("/logout", (req, res) => {
   res.status(200).json({ message: "Logout successful" });
 });
 
+app.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "No account found with this email." });
+    }
+
+    const resetToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, { expiresIn: "30m" });
+
+    res.status(200).json({
+      message: "Account verified. Please set a new password.",
+      resetToken,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post("/reset-password", async (req, res) => {
+  try {
+    const { email, token, password } = req.body;
+
+    if (!email || !token || !password) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (decoded.email !== email) {
+      return res.status(401).json({ message: "Invalid reset token." });
+    }
+
+    const user = await UserModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "No account found with this email." });
+    }
+
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful. Please login again." });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // ===================== Verify Token =====================
 
 app.get("/verify", async (req, res) => {
